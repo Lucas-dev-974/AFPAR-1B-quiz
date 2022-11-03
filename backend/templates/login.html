@@ -1,0 +1,58 @@
+
+{% extends 'index.html' %}
+
+{% block content %}
+    <input type="text" id="username" placeholder="username">
+    <input type="password" id="password" placeholder="password">
+    <button id="login-btn">Connexion</button>
+    {% csrf_token %}
+{% endblock content %}
+
+{% block scripts %}
+    <script>
+
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            // On récpère les input
+            let username = document.getElementById('username'), 
+                password = document.getElementById('password')
+                login_btn = document.getElementById('login-btn')
+
+            // On écoute si un click et fait sur le bouton connexion
+            login_btn.addEventListener('click', async () => {
+
+                // On récupère les valeurs des champs username & password
+                let username_value = username.value,
+                    password_value = password.value
+
+                // Vérifie si les champs son vide si oui on retourne un erreur en alert
+                if(!username_value || !password_value) return alert('veuillez complété les champs !')
+
+                // from utils.js dans le dossier statis on appel jsonToFormData
+                //  Pour convertir un json en formulaire 
+                const formdata = jsonToFormData({
+                    'username': username_value,
+                    'password': password_value
+                })
+
+                // On fait une requête vers le serveur pour se connecter
+                let response = await request('/api/login', formdata)
+
+                // Si la requête na pas le status 200 qui est "success" alors on retourne une erreur alert
+                if(response.status != 200){ 
+                    response = await response.json()
+                    return alert(response.errors)
+                }
+
+                // Sinon on récupère la réponse au format json puis on la stocke dans le localStorage et fait une redirecton vers la page dashbpard
+                response = await response.json()
+
+                // Ici on utilise une fonction créer dans utils.js qui permet de stocker une key:value dans le localStorage
+                storage.setState('token', response.token)
+                
+                // Et enfin on redirige l'utilisateur vers le dashboard
+                window.location.href = '/'
+            })
+        }) 
+    </script>
+{% endblock scripts %}
