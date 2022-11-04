@@ -17,10 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 from backend.Views import *
+from frontend.views import *
 
 urlpatterns = [
+    # Backend urls
     path('admin/', admin.site.urls),
-    path('api/', include('backend.urls')),
+    path('api/',   include('backend.urls')),
+    
+
+    # Frontend urls
     path('login', loginHTML),
-    path('', dashHTML),
+    path('',      dashHTML),
+
 ]

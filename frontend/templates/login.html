@@ -51,7 +51,7 @@
                 storage.setState('token', response.token)
                 
                 // Et enfin on redirige l'utilisateur vers le dashboard
-                window.location.href = '/'
+                {% comment %} window.location.href = '/' {% endcomment %}
             })
         }) 
     </script>
