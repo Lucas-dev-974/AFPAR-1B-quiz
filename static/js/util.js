@@ -1,10 +1,13 @@
+// Création d'une fonction stocké dans une variable qui vas permettre de gérer les données dans le localStorage
 const storage ={
+    // Retourne un objet JSON des données essentiels à l'app tel que le token, les informations utilisateurs (email, nom, prénom..), la liste des sessions récuperer....
     state: function(){
         let state = {}
-        if(localStorage.getItem('quizz-app')) state = JSON.parse(localStorage.getItem('quizz-app'))
+        if(localStorage.getItem('quizz-app-storage')) state = JSON.parse(localStorage.getItem('quizz-app-storage'))
         return state
     },
 
+    // Définie une valeur 
     setState: function(name, value) {
         let state = storage.state()
         state[name] = value
@@ -16,6 +19,7 @@ const storage ={
         localStorage.setItem('quizz-app', jsonstrstate)
     },
 
+    // retourne un json transformer en string
     strState: function(){
         return JSON.stringify(storage.state())
     }
