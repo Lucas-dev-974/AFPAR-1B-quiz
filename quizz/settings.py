@@ -154,3 +154,4 @@ STATICFILES_DIRS = (
 )
 
 STATIC_ROOT = '/static/'
+AUTH_USER_MODEL = 'backend.Salarie'
