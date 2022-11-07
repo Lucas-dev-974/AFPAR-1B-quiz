@@ -72,3 +72,15 @@ const jsonToFormData = (json) => {
 
     return data
 }
+
+// Permet de montrer qu'1 seul et unique élément HTML fesant parti d'une liste d'éléments 
+const paging = (pages_elements, show_page_id) => {
+    // afficher pages_elements pour voir ce que c'est -> (HTMLelement)
+    // On parcour la listes des pages 
+    pages_elements.forEach(page => {
+        // Si l'id de l'élément n'est pas = à l'idée renseigner alors on cache l'élément
+        if(page.id != show_page_id) page.style.display = 'none'
+        // Sinon on affiche l'élément si les ID sont égaux
+        else page.style.display = 'block'
+    })
+}
