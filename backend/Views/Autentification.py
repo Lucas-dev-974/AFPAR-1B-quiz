@@ -29,7 +29,7 @@ class AuthView(APIView):
     def delete(self, request):
         return JsonResponse()
 
-# Write file on serveur side
+# Inscrit le fichier dans le serveur 
 def handle_uploaded_file(f):
     upload_dir = 'backend/questionnaires/'
 
