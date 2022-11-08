@@ -6,7 +6,6 @@ from .managers import *
 
 
 class SecteursActivite(models.Model):
-    id_sa = models.IntegerField(db_column='ID_SA', primary_key=True)  # Field name made lowercase.
     type_secteur = models.CharField(db_column='Type_secteur', max_length=50)  # Field name made lowercase.
     titre_secteur = models.CharField(max_length=50)
 
