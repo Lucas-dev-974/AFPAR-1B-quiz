@@ -15,6 +15,8 @@ class SecteursActivite(models.Model):
 class Salarie(AbstractUser):
     username    = None
     email       = models.EmailField('email', unique=True)
+    nom         = models.CharField(max_length=70)
+    prenom      = models.CharField(max_length=70)
     role        = models.CharField('role', default='salarié', max_length=50)
     naissance   = models.DateField(null=True, blank=True)
     code_postal = models.CharField(max_length=30, default="974")
@@ -36,18 +38,15 @@ class Sessions(models.Model):
 
 
 class Participe(models.Model):
-    matricule_salarie = models.OneToOneField(Salarie, models.DO_NOTHING, db_column='Matricule_Salarie', primary_key=True)  # Field name made lowercase.
-    idsession = models.ForeignKey(Sessions, models.DO_NOTHING)  # Field name made lowercase.
-
-    class Meta:
-        unique_together = (('matricule_salarie', 'idsession'))
+    matricule_salarie = models.ForeignKey(Salarie, models.DO_NOTHING, unique=False)  # Field name made lowercase.
+    idsession = models.ForeignKey(Sessions, models.DO_NOTHING, unique=False)  # Field name made lowercase.
 
 class Quizz(models.Model):
     noteminimal = models.IntegerField(db_column='NoteMinimal', blank=True, null=True)  # Field name made lowercase.
     etat_brouillon = models.IntegerField(db_column='Etat_brouillon', blank=True, null=True)  # Field name made lowercase.
     nom_quizz = models.CharField(max_length=70, blank=True, null=True)
     idsession = models.ForeignKey(Sessions, models.DO_NOTHING)  # Field name made lowercase.
-    id_sa = models.OneToOneField(SecteursActivite, models.DO_NOTHING)  # Field name made lowercase.
+    id_sa = models.ForeignKey(SecteursActivite, models.DO_NOTHING, unique=False)  # Field name made lowercase.
 
 
 
@@ -64,27 +63,19 @@ class ReponsesPropose(models.Model):
 
 
 class Possede(models.Model):
-    idquizz = models.OneToOneField(Quizz, models.DO_NOTHING, primary_key=True)  # Field name made lowercase.
-    idquestion = models.ForeignKey(Questions, models.DO_NOTHING)  # Field name made lowercase.
+    idquizz = models.ForeignKey(Quizz, models.DO_NOTHING, unique=False)  # Field name made lowercase.
+    idquestion = models.ForeignKey(Questions, models.DO_NOTHING, unique=False)  # Field name made lowercase.
 
-    class Meta:
-        unique_together = (('idquizz', 'idquestion'),)
 
 class ReponseALaQuestion(models.Model):
-    idreponse = models.OneToOneField(ReponsesPropose, models.DO_NOTHING, primary_key=True)  # Field name made lowercase.
-    idquestion = models.ForeignKey(Questions, models.DO_NOTHING)  # Field name made lowercase.
-
-    class Meta:
-        unique_together = (('idreponse', 'idquestion'),)
+    idreponse = models.ForeignKey(ReponsesPropose, models.DO_NOTHING, unique=False)  # Field name made lowercase.
+    idquestion = models.ForeignKey(Questions, models.DO_NOTHING, unique=False)  # Field name made lowercase.
 
 
 class HistoriqueReponsesSelectionner(models.Model):
-    matricule_salarie = models.OneToOneField(Salarie, models.DO_NOTHING, primary_key=True)  # Field name made lowercase.
+    matricule_salarie = models.ForeignKey(Salarie, models.DO_NOTHING)  # Field name made lowercase.
     idquizz = models.ForeignKey(Quizz, models.DO_NOTHING)  # Field name made lowercase.
     idreponse = models.ForeignKey(ReponsesPropose, models.DO_NOTHING)  # Field name made lowercase.
     idquestion = models.ForeignKey(Questions, models.DO_NOTHING)  # Field name made lowercase.
     date_repondu = models.DateTimeField(blank=True, null=True)
     entrainement = models.BooleanField(blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        unique_together = (('matricule_salarie', 'idquizz', 'idreponse', 'idquestion'),)
