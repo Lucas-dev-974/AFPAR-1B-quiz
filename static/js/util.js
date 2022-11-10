@@ -16,31 +16,35 @@ const storage ={
 
     registerState: function(state) {
         const jsonstrstate = JSON.stringify(state)
-        localStorage.setItem('quizz-app', jsonstrstate)
+        localStorage.setItem('quizz-app-storage', jsonstrstate)
     },
 
-    // retourne un json transformer en string
-    strState: function(){
-        return JSON.stringify(storage.state())
-    }
 }
 
 const request = async (uri, params, method = 'POST') => {
     let token = null
 
-    params.append('csrfmiddlewaretoken', '{{csrf_token}}')
-    
+    if (params instanceof FormData) {
+        params = {
+            body: params
+        }
+    }
+    else{
+        params = {
+            data: params
+        }
+    }
+
     let options = {
         method: method,
         header: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Origin': '',
+            'Content-Type': 'application/json; charset=UTF-8',
+            // 'Origin': '',
             'Host': window.location.host,
             'Authorization': `Token ${token}`,
         },
-        body: params,
-
+        ...params,
     }
 
     if(storage.state().token){
@@ -84,3 +88,8 @@ const paging = (pages_elements, show_page_id) => {
         else page.style.display = 'block'
     })
 }
+
+const listPage = [
+    document.getElementById('page-1'),
+
+]
