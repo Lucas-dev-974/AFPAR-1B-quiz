@@ -2,14 +2,14 @@ from django.contrib.auth import authenticate, logout, login
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse, HttpResponse
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated  # <-- Here
+from rest_framework.permissions import IsAuthenticated
 from backend.Formulaire import *
 from backend.lector import *
 import json
 
+from backend.models import *
 
 class AuthView(APIView):
-    errors = []
     
     def post(self, request):
         login_form = LoginForm(request.POST)
@@ -17,11 +17,35 @@ class AuthView(APIView):
         if login_form.is_valid():
             username = login_form.cleaned_data['username']
             password = login_form.cleaned_data['password']
-            user = authenticate(username = username, password = password)
-            
+
+            # Vérifie si les identifiant de l'utilisateur sont corrects
+            user = authenticate(email = username, password = password)
+
             if user is not None:
+
+                # Si oui alors on le connect
+                login(request, user)
+
+                # puis on instancie un object user qui contient les infos de l'utilisateur 
+                _user = {
+                    "id": request.user.id,
+                    'matricul': request.user.matricul,
+                    'nom': request.user.nom,
+                    'prenom': request.user.prenom,
+                    'email': request.user.email,
+                    'role': request.user.role,
+                    'code_postal': request.user.code_postal,
+                    'naissance': request.user.naissance,
+                    'ville': request.user.ville,
+                    'secteur': {
+                        'type_secteur': request.user.secteur_activiter.type_secteur,
+                        'titre_secteur': request.user.secteur_activiter.titre_secteur
+                    }
+                }
+
+                # ensuite on génère un token de connexion qui seras utiliser dans toutes les requêtes au niveau du front end 
                 token = RefreshToken.for_user(user)
-                return JsonResponse({'token': str(token.access_token)})
+                return JsonResponse({'token': str(token.access_token), 'user': _user})
             else:
                 return JsonResponse({"errors": 'Vos identidiants sont incorrectes'}, status = 401)
 
@@ -119,7 +143,6 @@ class Salarie(APIView):
 
 
 class QuizzView(APIView):
-    # parser_classes = [FileUploadParser]
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
