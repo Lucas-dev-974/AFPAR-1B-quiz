@@ -147,7 +147,8 @@ STATICFILES_DIRS = (
 STATIC_ROOT = '/static/'
 AUTH_USER_MODEL = 'backend.Salarie'
 
+
 SIMPLE_JWT = {
-    'TOKEN_LIFETIME': timedelta(days=1),
-    'TOKEN_REFRESH_LIFETIME': timedelta(days=7),
-}
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+}                  
