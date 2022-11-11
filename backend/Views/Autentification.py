@@ -19,12 +19,13 @@ class AuthView(APIView):
             password = login_form.cleaned_data['password']
 
             # Vérifie si les identifiant de l'utilisateur sont corrects
-            user = authenticate(email = username, password = password)
+            authenticated_user = authenticate(email = username, password = password)
 
-            if user is not None:
+            if authenticated_user is not None:
 
                 # Si oui alors on le connect
-                login(request, user)
+                # Une fois cette fonction appeler les informations de l'utilisateur se retrouve dans le var request -> request.user
+                login(request, authenticated_user)
 
                 # puis on instancie un object user qui contient les infos de l'utilisateur 
                 _user = {
@@ -44,7 +45,7 @@ class AuthView(APIView):
                 }
 
                 # ensuite on génère un token de connexion qui seras utiliser dans toutes les requêtes au niveau du front end 
-                token = RefreshToken.for_user(user)
+                token = RefreshToken.for_user(authenticated_user)
                 return JsonResponse({'token': str(token.access_token), 'user': _user})
             else:
                 return JsonResponse({"errors": 'Vos identidiants sont incorrectes'}, status = 401)
@@ -55,6 +56,13 @@ class AuthView(APIView):
     def delete(self, request):
         return JsonResponse()
 
+class TestToken(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        return JsonResponse({'success': True})
+
+        
 # Inscrit le fichier dans le serveur 
 def handle_uploaded_file(f):
     upload_dir = 'backend/questionnaires/'
@@ -87,51 +95,11 @@ class HelloView(APIView):
         return JsonResponse({"ok": 'ok'})
 
 
-def getQuestionWithResponseOptions(questionid):
-    question_reponse = {}
-    
-    question = Questions.objects.get(pk=questionid)
-
-    if question is None: return False
-    
-    question_reponse['id'] = question.pk
-    question_reponse['intitule'] = question.intitule_question
-    question_reponse['reponses'] = []
 
 
-    linked_responses = ReponseALaQuestion.objects.filter(idquestion = questionid)
-
-    for link_reponse in linked_responses:
-        print(link_reponse.pk)
-        reponse = ReponsesPropose.objects.get(pk=link_reponse.pk)
-
-        question_reponse['reponses'].append({
-            'id': reponse.pk,
-            'intituler': reponse.intitule_reponse
-        })
-        
-    return question_reponse 
 
 
-class Question(APIView):
-    def get(self, request):
-        questionid = request.GET.get('questionid')
-        if(questionid.isdigit() == False): return JsonResponse({'status': 'L\'id dois être un nombre entier!'})
-        question = getQuestionWithResponseOptions(questionid)
-        return JsonResponse(question)
-
-    # TODO 
-    def post(self, request):
-        form = UploadFileForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            # Pour tous les fichiés présent dans la requête on en récuperent les questionnaires //
-            for filename, file in request.FILES.items():
-                getQuestionnaire(file)
-        return JsonResponse({"ok": 'ok'})
-
-
-class Salarie(APIView):
+class SalarieView(APIView):
     def post(self, request):
         if(len(request.FILES) > 0):
             in_file = []
@@ -174,6 +142,7 @@ class QuizzView(APIView):
                 idreponse_id = reponse['reponseid'],
                 idquestion_id = reponse['questionid']
             )
+
             print(reponse)
         return JsonResponse(quizz, safe=False)
 
@@ -183,3 +152,4 @@ def createSession(request):
     print('ko')
 
     return JsonResponse({'status': 'ok'})
+
