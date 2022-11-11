@@ -11,6 +11,8 @@ Dans le cadre des plans de perfectionnements du personnel, un chef de secteur se
 L'objectif ici et de dévellopper une interface web qui permet au gérents (DRH, RH, DSI, SI) et au chef de secteur de créer ou importer un ou des quizz par secteur d'activité et d'initié une sessions avec N participant pour répondre à X quizz, attention le chef de secteur lui ne peux créer des quizz que pour son secteur.
 Aussi une interface qui vas permettre aux salariées de voir un dashbaord avec les quizz passer et à passer.
 
+### Atteindre l'objectif
+Pour atteindre notre objectif on à monter un ScrumBan un tableau mélanger la méthode Scrum et la méthode kanban ou toutes les tâches à réaliser sont écrites et dédier à des membres de l'équipe avec une heure limite de réalisation déterminer par le membre choisi pour la tâche. Nous avions 3 sprint de 1 semaine pour la réalisation du projet.
 
 ## Choix technique 
 Pour ce projet notre équipe à choisi une architecture web API, il y'a donc une parti front-end et une parti backend,
@@ -30,7 +32,7 @@ créer une environement virtuel sous python avec venv ou pipenv incluant les pac
 Dans le dossier de l'environement virutel git cloner le projet: git clone https://github.com/Lucas-dev-974/AFPAR-1B-quiz.git
 
 ### Base de données
-Assurer d'avoir un client SGBD MySQL d'installer sur votre ordinateur et d'y avoir une database quizz à l'intérieur.
+Assurez vous d'avoir un client SGBD MySQL d'installer sur votre ordinateur et d'y avoir une database quizz à l'intérieur.
 Dans quizz/settings.py pour la key DATABASES configurer la bdd avec les vos accèes
 
 ### Migration 
