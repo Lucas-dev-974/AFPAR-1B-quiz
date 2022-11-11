@@ -1,0 +1,19 @@
+*{
+	font-family: 'Nunito' !important;
+}
+
+.full-height{
+	height: 100vh;
+}
+
+
+/* NAVBAR */
+#navbar{
+	height: 66px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: rgb(78, 209, 217);
+}.nav-title{
+	font-size: 1.2em;
+}
