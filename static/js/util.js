@@ -22,8 +22,8 @@ const storage ={
 }
 
 const request = async (uri, params, method = 'POST') => {
-    let token = storage.state().token ?? ''
-
+    let token = storage.state().token ? {'Authorization':  `Token ${token}`} : ''
+    
     if (params instanceof FormData) {
         params = {
             body: params
@@ -31,7 +31,7 @@ const request = async (uri, params, method = 'POST') => {
     }
     else{
         params = {
-            data: params
+            body: JSON.stringify(params)
         }
     }
 
@@ -39,12 +39,12 @@ const request = async (uri, params, method = 'POST') => {
         method: method,
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            ...token
         },
-        ...params,
+        ...params
     }
-
+    console.log(options)
     return await fetch(uri, options)
 }   
 
@@ -52,17 +52,15 @@ const jsonToFormData = (json) => {
     // Créer un formulaire 
     const data = new FormData()
     
-    if(json != null){
-        try{
-            // Pour chaque entrer du json on la récupère dans params qui lui est array qui contien en 0 le nom donner et en 1 la valeur  
-            Object.entries(json).forEach(param => {
-                data.append(param[0], param[1])
-            });
-            
-        }catch(error){
-            console.log(error);
-            alert('Désoler une erreur est survenue veuillez recharger la page !')
-        }
+    try{
+        // Pour chaque entrer du json on la récupère dans params qui lui est array qui contien en 0 le nom donner et en 1 la valeur  
+        Object.entries(json).forEach(param => {
+            data.append(param[0], param[1])
+        });
+        
+    }catch(error){
+        console.log(error);
+        alert('Désoler une erreur est survenue veuillez recharger la page !')
     }
 
     return data
