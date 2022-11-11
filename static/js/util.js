@@ -1,19 +1,32 @@
-// Création d'une fonction stocké dans une variable qui vas permettre de gérer les données dans le localStorage
+// Création d'une fonction storage (stockage) dans une variable qui vas permettre de gérer les données dans le localStorage
 const storage ={
     // Retourne un objet JSON des données essentiels à l'app tel que le token, les informations utilisateurs (email, nom, prénom..), la liste des sessions récuperer....
     state: function(){
+        // Instanciation d'un objet
         let state = {}
+
+        // Si dans le localStorage on à un item quizz-app-storage 
+        // Alors on récupère le stockage dans notre variable state
         if(localStorage.getItem('quizz-app-storage')) state = JSON.parse(localStorage.getItem('quizz-app-storage'))
+
+        // Et enfin on retourne notre object
         return state
     },
 
     // Définie une valeur 
     setState: function(name, value) {
+
+        // Récupère le stoackage
         let state = storage.state()
+
+        // Attribut la key:value donner en paramètres au stockage
         state[name] = value
+
+        // Réenregistre les stockage dans le localstorage
         storage.registerState(state)
     },
 
+    // Permet d'enregistrer un json dans le localStorage
     registerState: function(state) {
         const jsonstrstate = JSON.stringify(state)
         localStorage.setItem('quizz-app-storage', jsonstrstate)
@@ -21,19 +34,13 @@ const storage ={
 
 }
 
+//  Nous permet de faire des requêtes sans ce soucier d'incerer le token qui se trouve dans le stockage
 const request = async (uri, params, method = 'POST') => {
+
+    // Il eciste des condition courte qui peuvent se itervenir lors d'une déclaration de variable,
+    // comme si dessous, syntaxe condition courte : let variable = condition ? si oui : si non 
     let token = storage.state().token ? {'Authorization':  `Token ${storage.state().token}`} : ''
-    
-    if (params instanceof FormData) {
-        params = {
-            body: params
-        }
-    }
-    else{
-        params = {
-            body: JSON.stringify(params)
-        }
-    }
+    params = (params instanceof FormData) == true ? { body: params } : { body: JSON.stringify(params) }
 
     let options = {
         method: method,
