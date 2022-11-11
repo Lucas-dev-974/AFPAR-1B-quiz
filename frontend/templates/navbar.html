@@ -9,15 +9,23 @@
 
 
 	<section class="nav-right-side">
-		<button id='logout-btn' class="btn btn-outline-danger btn-sm">Me connecter</button>
+		<button id='logout-btn' class="btn btn-danger btn-sm">Me déconnecté</button>
 	</section>
 </nav>
 
 <script >
 	document.addEventListener('DOMContentLoaded', async () => {
-		const response     = await request('/api/token/check', {}, 'GET')
-		const jsonResponse = await response.json()
+		
+		if (window.location.href.includes('login')) 
+			document.getElementsByClassName('nav-right-side')[0].style.display = 'none'
 
-		if(response.status == 401) window.location.href = '/login'
+		if(!window.location.href.includes('login')){
+			const response     = await request('/api/token/check', method='GET')
+			const jsonResponse = await response.json()
+			
+
+			if(response.status != 401) window.location.href = '/login'
+		}
+
 	})
 </script>
