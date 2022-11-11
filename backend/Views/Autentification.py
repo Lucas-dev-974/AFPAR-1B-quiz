@@ -12,10 +12,10 @@ from backend.models import *
 class AuthView(APIView):
     
     def post(self, request):
-        print(request.data['username'])
-        # login_form = LoginForm(email = request.data['username'], password = request.data['password'])
-       
-        if True:
+        
+        login_form = LoginSerializer(data=request.data)
+        
+        if login_form.is_valid():
             username = request.data['username']
             password = request.data['password']
 
