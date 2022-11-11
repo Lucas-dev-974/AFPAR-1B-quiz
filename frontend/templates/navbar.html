@@ -1,0 +1,23 @@
+{% load static %}
+
+<nav id="navbar" class="px-4">
+	<section class="nav-left-side">
+		<span class="nav-title">
+			<img width="100" src="{% static '/medias/icone.png' %}">
+		</span>
+	</section>
+
+
+	<section class="nav-right-side">
+		<button id='logout-btn' class="btn btn-outline-danger btn-sm">Me connecter</button>
+	</section>
+</nav>
+
+<script >
+	document.addEventListener('DOMContentLoaded', async () => {
+		const response     = await request('/api/token/check', {}, 'GET')
+		const jsonResponse = await response.json()
+
+		if(response.status == 401) window.location.href = '/login'
+	})
+</script>
