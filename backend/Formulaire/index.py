@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 
 class LoginForm(forms.Form):
-    username = forms.CharField(
+    email = forms.CharField(
         label='Nom utilisateur', 
         max_length=70, 
         required=True,
