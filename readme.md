@@ -7,6 +7,10 @@ Il s’agit de développer un petit applicatif spécifique qui fonctionnerait su
 
 Dans le cadre des plans de perfectionnements du personnel, un chef de secteur sera amené à proposer à toutes ses équipes (ou à certains de ses collaborateurs seulement) de répondre à un de ces quizs à un instant T. Tout le process serait essentiellement piloté au niveau du service RH, par un responsable des opérations désigné… On souhaite surtout une interface simple et un process facile à comprendre pour les divers usagers de cette future application web sur notre intranet.
 
+## Objectif
+L'objectif ici et de dévellopper une interface web qui permet au gérents (DRH, RH, DSI, SI) et au chef de secteur de créer ou importer un ou des quizz par secteur d'activité et d'initié une sessions avec N participant pour répondre à X quizz, attention le chef de secteur lui ne peux créer des quizz que pour son secteur.
+Aussi une interface qui vas permettre aux salariées de voir un dashbaord avec les quizz passer et à passer.
+
 ## Choix technique 
 Pour ce projet notre équipe à choisi une architecture web API, il y'a donc une parti front-end et une parti backend,
 le framework Django nous à été imposé lors du brief avec le product Owner,
