@@ -22,7 +22,7 @@ const storage ={
 }
 
 const request = async (uri, params, method = 'POST') => {
-    let token = null
+    let token = storage.state().token ?? ''
 
     if (params instanceof FormData) {
         params = {
@@ -37,22 +37,13 @@ const request = async (uri, params, method = 'POST') => {
 
     let options = {
         method: method,
-        header: {
+        headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json; charset=UTF-8',
-            // 'Origin': '',
-            'Host': window.location.host,
-            'Authorization': `Token ${token}`,
+            'Authorization': `Bearer ${token}`,
         },
         ...params,
     }
-
-    if(storage.state().token){
-        token = storage.state().token
-        options.header.Authorization = 'Token ' + token
-    }else console.log('aucun token renseigner');
-
-    
 
     return await fetch(uri, options)
 }   
