@@ -19,7 +19,7 @@
                 <input type="password" class="form-control" id="password">
               </div>
               <div class="d-flex justify-content-center">
-                  <button id='login-btn' class="btn btn-primary">Me connecter</button>
+                  <button id='connexion-btn' class="btn btn-primary">Me connecter</button>
               </div>
               
             </div>
@@ -35,11 +35,11 @@
             // On récpère les input
             let username = document.getElementById('username'), 
                 password = document.getElementById('password')
-                login_btn = document.getElementById('login-btn')
+                login_btn = document.getElementById('connexion-btn')
+
 
             // On écoute si un click et fait sur le bouton connexion
             login_btn.addEventListener('click', async () => {
-
                 // On récupère les valeurs des champs username & password
                 let username_value = username.value,
                     password_value = password.value
@@ -49,30 +49,30 @@
 
                 // from utils.js dans le dossier statis on appel jsonToFormData
                 //  Pour convertir un json en formulaire 
-                const formdata = jsonToFormData({
+                
+                // On fait une requête vers le serveur pour se connecter
+                const formdata ={
                     'username': username_value,
                     'password': password_value
-                })
+                }
 
-                // On fait une requête vers le serveur pour se connecter
-                let response = await request('/api/login', formdata)
-
+                const response = await request('/api/login', formdata)
+                const jsonResponse = await response.json()
                 // Si la requête na pas le status 200 qui est "success" alors on retourne une erreur alert
                 if(response.status != 200){ 
-                    response = await response.json()
-                    return alert(response.errors)
+                    return alert(jsonResponse.errors)
                 }
 
                 // Sinon on récupère la réponse au format json puis on la stocke dans le localStorage et fait une redirecton vers la page dashbpard
-                response = await response.json()
-
+                
+                console.log(jsonResponse)
                 // Ici on utilise une fonction créer dans utils.js qui permet de stocker une paires key:value dans le localStorage
-                storage.setState('token', response.token)
-                storage.setState('user', response.user)
+                storage.setState('token', jsonResponse.token)
+                storage.setState('user', jsonResponse.user)
 
 
                 // Et enfin on redirige l'utilisateur vers le dashboard
-                window.location.href = '/'
+                //window.location.href = '/'
             })
         }) 
     </script>
