@@ -22,7 +22,7 @@ const storage ={
 }
 
 const request = async (uri, params, method = 'POST') => {
-    let token = storage.state().token ? {'Authorization':  `Token ${token}`} : ''
+    let token = storage.state().token ? {'Authorization':  `Token ${storage.state().token}`} : ''
     
     if (params instanceof FormData) {
         params = {
