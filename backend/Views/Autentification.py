@@ -6,17 +6,18 @@ from rest_framework.permissions import IsAuthenticated
 from backend.Formulaire import *
 from backend.lector import *
 import json
-
+from django.utils.html import escape
 from backend.models import *
 
 class AuthView(APIView):
     
     def post(self, request):
-        login_form = LoginForm(request.POST)
-
-        if login_form.is_valid():
-            username = login_form.cleaned_data['username']
-            password = login_form.cleaned_data['password']
+        print(request.data['username'])
+        # login_form = LoginForm(email = request.data['username'], password = request.data['password'])
+       
+        if True:
+            username = request.data['username']
+            password = request.data['password']
 
             # Vérifie si les identifiant de l'utilisateur sont corrects
             authenticated_user = authenticate(email = username, password = password)
@@ -51,7 +52,7 @@ class AuthView(APIView):
                 return JsonResponse({"errors": 'Vos identidiants sont incorrectes'}, status = 401)
 
         else:
-            return JsonResponse({"errors": "Les champs renseigner sont invalides !"})
+            return JsonResponse({"errors": "Les champs renseigner sont invalides !"}, status=400    )
 
     def delete(self, request):
         return JsonResponse()
