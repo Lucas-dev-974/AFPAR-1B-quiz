@@ -1,12 +1,10 @@
 from django.contrib.auth import authenticate, logout, login
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from backend.Formulaire import *
 from backend.lector import *
-import json
-from django.utils.html import escape
 from backend.models import *
 
 class AuthView(APIView):
@@ -62,91 +60,6 @@ class TestToken(APIView):
 
     def get(self, request):
         return JsonResponse({'success': True})
-
-        
-# Inscrit le fichier dans le serveur 
-def handle_uploaded_file(f):
-    upload_dir = 'backend/questionnaires/'
-
-    t = open( upload_dir + f.name, 'w')
-    t.close()
-
-    with open( upload_dir + f.name, 'wb+') as destination:
-        print('ok 2')
-        for chunk in f.chunks():
-            destination.write(chunk)
-
-    
-
-class HelloView(APIView):
-    # Permet de vérifier si le demandeur de la requête à bien fourni un token signé
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        content = {'message': 'Hello, World!'}
-        return JsonResponse(content)
-
-    def post(self, request):
-        
-        form = UploadFileForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            for filename, file in request.FILES.items():
-                getQuestionnaire(file)
-        return JsonResponse({"ok": 'ok'})
-
-
-
-
-
-
-class SalarieView(APIView):
-    def post(self, request):
-        if(len(request.FILES) > 0):
-            in_file = []
-            for filename, file in request.FILES.items():
-                in_file.append(getSalaries(file))
-                
-
-        return JsonResponse({"status": True})
-
-
-class QuizzView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        quizzid = request.GET.get('quizzid')    
-        if(quizzid.isdigit() == False): return JsonResponse({'status': 'L\'id dois être un nombre entier!'})
-
-        quizz_data = {}
-
-        quizz = Quizz.objects.get(pk=quizzid)
-        possede_questions = Possede.objects.filter(idquizz = quizz.pk)
-        
-        quizz_data['quizzid']   = quizz.pk
-        quizz_data['questions'] = []
-
-        for posseder in possede_questions:
-            question_id = posseder.idquestion_id
-            quizz_data['questions'].append( getQuestionWithResponseOptions(question_id))
-
-        return JsonResponse(quizz_data)
-
-    
-    def post(self, request):
-        quizz = request.data
-        print(request.user.email)
-        for reponse in quizz['reponses']:
-            histo_reponse_quizz = HistoriqueReponsesSelectionner.objects.create(
-                matricule_salarie_id = request.user.id,
-                idquizz_id = quizz['quizzid'],
-                idreponse_id = reponse['reponseid'],
-                idquestion_id = reponse['questionid']
-            )
-
-            print(reponse)
-        return JsonResponse(quizz, safe=False)
-
 
 def createSession(request):
     print(type(request.POST))

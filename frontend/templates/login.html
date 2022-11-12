@@ -46,9 +46,6 @@
 
                 // Vérifie si les champs son vide si oui on retourne un erreur en alert
                 if(!username_value || !password_value) return alert('veuillez complété les champs !')
-
-                // from utils.js dans le dossier statis on appel jsonToFormData
-                //  Pour convertir un json en formulaire 
                 
                 // On fait une requête vers le serveur pour se connecter
                 const formdata ={
@@ -63,16 +60,12 @@
                     return alert(jsonResponse.errors)
                 }
 
-                // Sinon on récupère la réponse au format json puis on la stocke dans le localStorage et fait une redirecton vers la page dashbpard
-                
-                console.log(jsonResponse)
                 // Ici on utilise une fonction créer dans utils.js qui permet de stocker une paires key:value dans le localStorage
                 storage.setState('token', jsonResponse.token)
                 storage.setState('user', jsonResponse.user)
 
-
                 // Et enfin on redirige l'utilisateur vers le dashboard
-                //window.location.href = '/'
+                window.location.href = '/'
             })
         }) 
     </script>

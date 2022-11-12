@@ -86,3 +86,34 @@ class QuizzView(APIView):
             )
             print(reponse)
         return JsonResponse(quizz, safe=False)
+
+# Inscrit le fichier dans le serveur 
+def handle_uploaded_file(f):
+    upload_dir = 'backend/questionnaires/'
+
+    t = open( upload_dir + f.name, 'w')
+    t.close()
+
+    with open( upload_dir + f.name, 'wb+') as destination:
+        print('ok 2')
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+    
+
+class importQuizz(APIView):
+    # Permet de vérifier si le demandeur de la requête à bien fourni un token signé
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        content = {'message': 'Hello, World!'}
+        return JsonResponse(content)
+
+    def post(self, request):
+        
+        form = UploadFileForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            for filename, file in request.FILES.items():
+                getQuestionnaire(file)
+        return JsonResponse({"ok": 'ok'})

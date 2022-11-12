@@ -39,19 +39,27 @@ const request = async (uri, params, method = 'POST') => {
 
     // Il eciste des condition courte qui peuvent se itervenir lors d'une déclaration de variable,
     // comme si dessous, syntaxe condition courte : let variable = condition ? si oui : si non 
-    let token = storage.state().token ? {'Authorization':  `Token ${storage.state().token}`} : ''
-    params = (params instanceof FormData) == true ? { body: params } : { body: JSON.stringify(params) }
+    const token = storage.state().token ?? ''
+    const tokenAuthorization = token != '' ? {'Authorization':  ` Token  ${token} `} : ''
+        
+    if(method != 'GET')
+        params = (params instanceof FormData) == true ? { body: params } : { body: JSON.stringify(params) }
+    else
+        params = { params: params }
+
 
     let options = {
         method: method,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            ...token
+            ...tokenAuthorization
         },
         ...params
     }
-    console.log(options)
+
+    console.log('options de la requêtes:', options)
+    
     return await fetch(uri, options)
 }   
 
