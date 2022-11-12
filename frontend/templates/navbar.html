@@ -20,11 +20,17 @@
 			document.getElementsByClassName('nav-right-side')[0].style.display = 'none'
 
 		if(!window.location.href.includes('login')){
-			const response     = await request('/api/token/check', method='GET')
+			const response     = await request('/api/token/check', {token: storage.state().token ?? 'none'})
 			const jsonResponse = await response.json()
 			
 
-			if(response.status != 401) window.location.href = '/login'
+			if(response.status == 401) window.location.href = '/login'
+
+			const logout_btn = document.getElementById('logout-btn')
+			logout_btn.addEventListener('click', () => {
+				storage.setState('token', null)
+				window.location.href = '/login'
+			})
 		}
 
 	})
