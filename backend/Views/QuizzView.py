@@ -143,4 +143,4 @@ class QuizzImport(APIView):
 
                 # question = Questions.objects.create
             
-            return JsonResponse({'status': getQuizz(quizz_id=quizz.pk)})
+            return JsonResponse(getQuizz(quizz_id=quizz.pk))

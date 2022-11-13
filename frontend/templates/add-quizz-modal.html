@@ -86,6 +86,8 @@
                     quizz_questions: quizz
                 })
 
+                const jsonresponse = await response.json()
+                console.log(jsonresponse);
             })
 
             addQuestionFieldBtn.addEventListener('click', () => {
