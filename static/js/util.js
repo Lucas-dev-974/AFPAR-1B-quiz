@@ -40,10 +40,23 @@ const request = async (uri, params, method = 'POST') => {
     // Il eciste des condition courte qui peuvent se itervenir lors d'une déclaration de variable,
     // comme si dessous, syntaxe condition courte : let variable = condition ? si oui : si non 
     const token = storage.state().token ?? ''
-    const tokenAuthorization = token != '' ? {'Authorization':  ` Token  ${token} `} : ''
-        
-    if(method != 'GET')
-        params = (params instanceof FormData) == true ? { body: params } : { body: JSON.stringify(params) }
+    const tokenAuthorization = token != '' ? {'Authorization':  'Token ' + token} : ''
+    let head = {}
+
+    if(method != 'GET'){
+        if(params instanceof FormData){
+            params = { body: params }
+        }else{
+            head = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                xsrfCookieName: 'csrftoken',
+                xsrfHeaderName: 'X-CSRFToken',
+                withCredentials: true
+            }
+            params = {body: JSON.stringify(params)}
+        }
+    }
     else
         params = { params: params }
 
@@ -51,8 +64,7 @@ const request = async (uri, params, method = 'POST') => {
     let options = {
         method: method,
         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
+            ...head,
             ...tokenAuthorization
         },
         ...params

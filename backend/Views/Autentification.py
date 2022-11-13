@@ -55,11 +55,6 @@ class AuthView(APIView):
     def delete(self, request):
         return JsonResponse()
 
-class TestToken(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        return JsonResponse({'success': True})
 
 def createSession(request):
     print(type(request.POST))

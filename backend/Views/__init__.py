@@ -1,2 +1,3 @@
 from .Autentification import *
-from .QuestionView import *
+from .QuizzView import *
+from .SalarieView import *

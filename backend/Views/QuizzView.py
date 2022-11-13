@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
-
+from backend.Formulaire import *
 from backend.models import *
-
+from backend.lector import *
+from .utilsForView import *
 
 # Méthode qui permet de récuperer des une question via son ID et les ses réponses possible 
 def getQuestionWithResponseOptions(questionid):
@@ -33,14 +34,16 @@ def getQuestionWithResponseOptions(questionid):
 
 
 class Question(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         questionid = request.GET.get('questionid')
         if(questionid.isdigit() == False): return JsonResponse({'status': 'L\'id dois être un nombre entier!'})
         question = getQuestionWithResponseOptions(questionid)
         return JsonResponse(question)
 
-    # TODO 
     def post(self, request):
+        if isAdmin(request) == False: return JsonResponse({'status': 'Vous devez être DSI ou DRH pour importer de nouveaux salariés'}, status = 401)
         form = UploadFileForm(request.POST, request.FILES)
 
         if form.is_valid():
@@ -76,7 +79,7 @@ class QuizzView(APIView):
     
     def post(self, request):
         quizz = request.data
-        print(request.user.email)
+        
         for reponse in quizz['reponses']:
             histo_reponse_quizz = HistoriqueReponsesSelectionner.objects.create(
                 matricule_salarie_id = request.user.id,
@@ -84,36 +87,25 @@ class QuizzView(APIView):
                 idreponse_id = reponse['reponseid'],
                 idquestion_id = reponse['questionid']
             )
-            print(reponse)
+            print(histo_reponse_quizz)
         return JsonResponse(quizz, safe=False)
-
-# Inscrit le fichier dans le serveur 
-def handle_uploaded_file(f):
-    upload_dir = 'backend/questionnaires/'
-
-    t = open( upload_dir + f.name, 'w')
-    t.close()
-
-    with open( upload_dir + f.name, 'wb+') as destination:
-        print('ok 2')
-        for chunk in f.chunks():
-            destination.write(chunk)
-
     
 
-class importQuizz(APIView):
+class QuizzImport(APIView):
     # Permet de vérifier si le demandeur de la requête à bien fourni un token signé
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
-        content = {'message': 'Hello, World!'}
-        return JsonResponse(content)
-
     def post(self, request):
+        if isAdmin(request) == False: return JsonResponse({'status': 'Vous devez être DSI ou DRH pour importer de nouveaux salariés'}, status = 401)
+        print(request.path)
         
-        form = UploadFileForm(request.POST, request.FILES)
+        if('imports' in request.path): 
+            form = UploadFileForm(request.POST, request.FILES)
 
-        if form.is_valid():
-            for filename, file in request.FILES.items():
-                getQuestionnaire(file)
-        return JsonResponse({"ok": 'ok'})
+            if form.is_valid():
+                for filename, file in request.FILES.items():
+                    getQuestionnaire(file)
+            return JsonResponse({"ok": 'ok'})
+        
+        if('creer' in request.path):
+            print('ok')
