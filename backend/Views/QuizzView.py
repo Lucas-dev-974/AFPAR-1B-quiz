@@ -32,6 +32,23 @@ def getQuestionWithResponseOptions(questionid):
         
     return question_reponse 
 
+def getQuizz(quizz_id):
+    quizz = {}
+
+    _quizz = Quizz.objects.get(pk=quizz_id)
+    if _quizz is None: return False
+
+    quizz['id']  = _quizz.pk
+    quizz['nom'] = _quizz.nom_quizz
+
+    linked_question = Possede.objects.filter(idquizz = _quizz.pk)
+
+    quizz['questions'] = []
+
+    for qlink in linked_question:
+        quizz['questions'].append(getQuestionWithResponseOptions(qlink.idquestion.pk))
+    return quizz
+
 
 class Question(APIView):
     permission_classes = (IsAuthenticated,)
@@ -68,6 +85,7 @@ class QuizzView(APIView):
         possede_questions = Possede.objects.filter(idquizz = quizz.pk)
         
         quizz_data['quizzid']   = quizz.pk
+        quizz_data['nom']       = quizz.nom_quizz
         quizz_data['questions'] = []
 
         for posseder in possede_questions:
@@ -97,8 +115,7 @@ class QuizzImport(APIView):
 
     def post(self, request):
         if isAdmin(request) == False: return JsonResponse({'status': 'Vous devez être DSI ou DRH pour importer de nouveaux salariés'}, status = 401)
-        print(request.path)
-        
+    
         if('imports' in request.path): 
             form = UploadFileForm(request.POST, request.FILES)
 
@@ -108,4 +125,22 @@ class QuizzImport(APIView):
             return JsonResponse({"ok": 'ok'})
         
         if('creer' in request.path):
-            print('ok')
+            print(request.data)
+            session = Sessions.objects.create(date_de_deploiment = request.data['session_deploiment'])
+            quizz   = Quizz.objects.create(nom_quizz = request.data['quizz_name'], idsession_id = session.pk, id_sa_id = 1)
+
+            for question in request.data['quizz_questions']:
+                question_ = Questions.objects.create(intitule_question = question['intitule'])
+                linkQuestionToQuizz({
+                    "quizzid": quizz.pk,
+                    'questionid': question_.pk
+                })
+
+                for reponse in question['responses_options']:
+                    reponse = ReponsesPropose.objects.create(intitule_reponse = reponse['intitule'], bonne_reponse = reponse['bonne'])
+                    linkResponseToQuestion(reponse.pk, question_.pk)
+                
+
+                # question = Questions.objects.create
+            
+            return JsonResponse({'status': getQuizz(quizz_id=quizz.pk)})
