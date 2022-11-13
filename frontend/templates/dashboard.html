@@ -2,8 +2,44 @@
 
 {% block content %}
     <h3>Dashboard</h3>
+
+    <div class="card" style="width: 50%;">
+        <div class="card-header">
+            Import massif
+        </div>
+        <div>
+            <input type="file" multiple="multiple" id="quizz_import_file_input">
+            <button id="quizz_import_btn">Importer</button>
+        </div>
+    </div>
+
+
+    <div class="card">
+
+    </div>
+
+    {% include 'add-quizz-modal.html' %}
 {% endblock content %}
 
 {% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', ()=> {
+            const quizz_import_btn = document.getElementById('quizz_import_btn')
+            const input_file       = document.getElementById('quizz_import_file_input')
 
+            quizz_import_btn.addEventListener('click', async ()=> {
+                let mode = 'multiple'
+
+
+                const response = await request('/api/quizz/imports', jsonToFormData({
+                    mode: mode,
+                    file: input_file.files[0]
+                }))
+                console.log(response)   
+            })
+       
+
+            
+        })
+    </script>
 {% endblock scripts %}
