@@ -1,0 +1,145 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Ajouter un quizz
+</button>
+  
+  <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Créer une session de quizz</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <button id="add_question_field" class="btn btn-primary w-100 my-1   " type='button'>Ajouter une question</button>
+            <div class="" id="fields_for_quizz_creation" class='' >
+                
+            </div>
+        </div>
+        <div class="modal-footer d-flex">
+            <div class="w-40">
+                <label for="date_session">Date de déploiement</label>
+                <input id="date_session" class="form-control w-40" type="date" />    
+            </div>
+            
+            <button type="button" class="btn btn-secondary" id="log-form-quizz">log form</button>
+            <button type="button" class="btn btn-primary" id="ajout_quizz_btn">Save changes</button>
+        </div>
+        </div>
+    </div>
+</div>
+  
+<script>
+            const creationFormQuizz = document.getElementById('fields_for_quizz_creation')
+            const addQuestionFieldBtn = document.getElementById('add_question_field')
+
+            const logFormQuizz = document.getElementById('log-form-quizz')
+            const addQuizzBtn  = document.getElementById('ajout_quizz_btn')
+
+
+
+            function getQuizz(){
+                const numberQuestion = creationFormQuizz.childElementCount
+                // console.log(numberQuestion);
+
+                const json = []
+                let jsonQuestion = {}
+                // Parcour les questions
+                for(i = 0; i < numberQuestion; i++){
+                    jsonQuestion = {}
+                    
+                    const questionContainer = creationFormQuizz.children[i]
+                    const intituleQuestion = questionContainer.getElementsByClassName('question-input')[0].value
+
+                    const responseContainer   = questionContainer.getElementsByClassName('anwser_options')[0]
+                    const numberOptionsResponse = responseContainer.childElementCount
+                    
+                    jsonQuestion['intitule'] = intituleQuestion
+                    jsonQuestion['responses_options'] = []
+
+                    // Parcour des options de 
+                    for(j = 0; j < numberOptionsResponse; j++){
+                        responseElement = responseContainer.children[j]
+                        if(responseElement.tagName != 'BUTTON'){
+                            let intituleResponse = responseElement.children[0].value
+                            let bonne = responseElement.children[1].checked
+                            jsonQuestion['responses_options'].push({
+                                intitule: intituleResponse,
+                                bonne: bonne
+                            })
+                        }
+                    }
+                    json.push(jsonQuestion)
+                }
+                return json
+            }
+
+            addQuizzBtn.addEventListener('click', async () => {
+                const quizz = getQuizz()
+
+                const date_deploiement = document.getElementById('date_session')
+
+                const response = await request('/api/quizz/creer', {
+                    session_deploiment: date_deploiement.value,
+                    quizz_name: 'untilted',
+                    quizz_questions: quizz
+                })
+
+            })
+
+            addQuestionFieldBtn.addEventListener('click', () => {
+                // On récupère le nombre total de questions instancié + 1 pour créer un ID
+                // L'ID est utile pour différencier  nos conteneur de question ansi qu'aux radios boutons 
+                const questionid =  creationFormQuizz.childElementCount + 1
+                
+                // On créer un conteneur pour notre question à instancié
+                // Ce conteneur contien un input qui est l'intitulé de la question 
+                // ainsi qu'un élément conteneur pour les réponses possibles 
+                const question_field = document.createElement('div')
+                question_field.setAttribute('class', 'question_field qf-' + questionid)
+
+                // On créer l'input pour entrer l'intitulé de la question
+                const input_question_field = document.createElement('input')
+                input_question_field.setAttribute('placeholder', 'Entrer l\'intitule de la question')
+                input_question_field.setAttribute('class', 'form-control my-1 question-input')
+
+                // On créer le conteneur des réponses possible pour la question
+                // Le conteneur de réponse possible lui contient un bouton pour ajouter des choix de réponse
+                // Ainsi que les inputs de ces choix 
+                const responseOptionFieldsContainer = document.createElement('div')
+                responseOptionFieldsContainer.setAttribute('class', 'anwser_options answer-container ms-3 ')
+
+                // On créer un bouton pour ajouter un input de réponse possible
+                const addAnswerField = document.createElement('button')
+                addAnswerField.setAttribute('class', 'btn btn-primary w-100 btn-sm')
+                addAnswerField.innerHTML = 'Ajouter une réponse possible'
+
+
+                responseOptionFieldsContainer.appendChild(addAnswerField)
+
+                question_field.appendChild(input_question_field)
+
+                question_field.appendChild(responseOptionFieldsContainer)
+                creationFormQuizz.appendChild(question_field)
+                
+
+                addAnswerField.addEventListener('click', () => {
+                    const AnswerField = document.createElement('div')
+                    AnswerField.setAttribute('class', 'd-flex align-items-center my-1')
+                    
+                    const AnswerInput    = document.createElement('input')
+                    AnswerInput.setAttribute('placeholder', 'Entrer l\'intitulé de la réponse')
+                    AnswerInput.setAttribute('class', 'form-control')
+
+                    const radioGoodAnswer = document.createElement('input')
+                    radioGoodAnswer.setAttribute('class', 'form-check-input ms-3')
+                    radioGoodAnswer.setAttribute('type', 'radio')
+                    radioGoodAnswer.setAttribute('name', 'good-answer' + questionid)
+
+                    AnswerField.appendChild(AnswerInput)
+                    AnswerField.appendChild(radioGoodAnswer)
+                    responseOptionFieldsContainer.insertBefore(AnswerField, addAnswerField)
+                })
+            })
+</script>
