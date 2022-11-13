@@ -53,6 +53,7 @@
                     'password': password_value
                 }
 
+                storage.setState('token', '')
                 const response = await request('/api/login', formdata)
                 const jsonResponse = await response.json()
                 // Si la requête na pas le status 200 qui est "success" alors on retourne une erreur alert
