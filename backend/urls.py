@@ -7,7 +7,10 @@ urlpatterns = [
     path('login', AuthView.as_view()),
     path('token/check', TokenVerifyView.as_view()),
 
-    path('quizz/imports', importQuizz.as_view()),
+    path('quizz/imports', QuizzImport.as_view()), # POST
+    path('quizz/creer',   QuizzImport.as_view()), # POST
+    path('quizz',         QuizzView.as_view()),   # GET
+
     path('question', Question.as_view()),
     
     path('salaries/import', SalarieView.as_view()),
@@ -16,7 +19,4 @@ urlpatterns = [
     # POST répondre à un quizz
     # GET récuperer un quizz via son id
     # PATCH modifier un quizz
-    path('quizz', QuizzView.as_view()),
-
-    
 ]
