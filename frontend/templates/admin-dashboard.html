@@ -1,0 +1,75 @@
+<div class="card my-2 mx-2"> 
+    <div class="card-body">
+        <h5 class="card-title">
+            Admin dashboard
+            {% include 'add-quizz-modal.html' %}
+        </h5>
+
+        <div id='page-quizz'>
+            <h6> Quizz par session </h6>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Session date</th>
+                    <th scope="col">Nombre de participant</th>
+                    <th scope="col">Quizz associé</th>
+                    <th scope="col"> Action </th> 
+                  </tr>
+                </thead>
+                <tbody id="quizz_body_table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    async function getQuizzsList(){
+        const response = await request('/api/quizzs', {}, 'GET')
+        if(response.status != 200) return alert('Une erreur est survenue')
+        return await response.json()
+
+    }
+
+    function addRowInTable(data){
+        const table_body = document.getElementById('quizz_body_table')
+        console.log(data)
+
+        const tr_row = document.createElement('tr')
+
+        const session_date = document.createElement('td')
+        session_date.innerHTML = data.in_session.date_de_deploiement ?? 'Pas encore de date prévue'
+
+        const participants = document.createElement('td')
+        participants.innerHTML = data.participants
+
+        const quizz_associe     = document.createElement('td')
+        quizz_associe.innerHTML = data.nom ?? 'Aucun nom pour le quizz' 
+        quizz_associe.setAttribute('quizz-id', data.id)
+
+        const td_btn = document.createElement('td')
+
+        const showQuizz = document.createElement('button')
+        showQuizz.innerHTML = 'Voir quizz'
+        showQuizz.setAttribute('class', 'btn btn-sm btn-primary')
+        
+        td_btn.appendChild(showQuizz)
+
+        tr_row.appendChild(session_date)
+        tr_row.appendChild(participants)
+        tr_row.appendChild(quizz_associe)
+        tr_row.appendChild(td_btn)
+
+        table_body.appendChild(tr_row)
+    }
+
+    document.addEventListener('DOMContentLoaded', async ()=>{
+        const quizzs = await getQuizzsList()
+
+        quizzs.forEach(quizz => {
+            addRowInTable(quizz)
+        })
+    })
+    
+</script>
