@@ -1,0 +1,124 @@
+<div id='custom_modal' class="custom_modal"> 
+
+    <!-- Modal content -->
+    <div class="custom_modal_content">
+        <div class='d-flex justify-content-between align-items-center'>
+            <span id="modal_title">Titre de la modal</span>
+            <span class="close" id="close_modal">&times;</span>
+        </div> 
+        
+        <div class="modal-body" id="custom_modal_body">
+            
+        </div>
+
+        <div class="modal_action" id="modal_action">
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const openModal = (event, callback) => {
+        const modal      = document.getElementById('custom_modal')
+        const modal_body = document.getElementById('custom_modal_body')
+        const modal_action = document.getElementById('modal_action')
+
+        modal.style.display = "block";
+
+        // Récuperer les attributs du bouton 
+        // Le type de la modal 
+        const attrs = event.target.attributes
+        const modal_type = attrs['data-type'].value
+
+        const modal_title = document.getElementById('modal_title')
+
+        
+        switch(modal_type){
+            case "quizzs_passage":
+                quizz = storage.getItemWhere(attrs['data-type'].value, {
+                    value: attrs['data-id'].value,
+                    on_field: 'id'
+                })
+
+                quizz.questions.forEach(question => {
+                    const q_field = questionField_component(question)
+                    modal_body.appendChild(q_field)
+                })
+
+                modal_title.innerHTML = 'Passage du quizz ' + quizz.nom
+                modal_action.appendChild(passageQuizzAction_component())
+                break
+            
+        }    
+
+        // Ferme la modal
+        const close = document.getElementById('close_modal')
+        close.onclick = () => { 
+            modal.style.display = 'none' 
+            modal_body.innerHTML = ''
+            modal_action.innerHTML = ''
+        }
+    } 
+
+
+    function passageQuizzAction_component(){
+        const sendQuizzResponses_btn = document.createElement('button')
+        sendQuizzResponses_btn.setAttribute('class', 'btn btn-sm btn-primary')
+        sendQuizzResponses_btn.innerHTML = 'Envoyer mes réponse'
+
+        sendQuizzResponses_btn.onclick = getQuizzResponsesJSON
+        return sendQuizzResponses_btn
+    }
+
+    function getQuizzResponsesJSON(){
+        const body_container = document.getElementById('custom_modal_body')
+        const questions_field = body_container.getElementsByClassName('question_field')
+        console.log(questions_field);
+    }
+
+    function getResponseForQuestion(question_el){
+
+    }
+
+    
+    function questionField_component(question){
+        const q_field = document.createElement('div')
+            q_field.setAttribute('class', 'question_field qf-' + question.id)
+            q_field.setAttribute('question-id', question.id)
+
+        const q_intitule = document.createElement('h6')
+            q_intitule.innerHTML = question.intitule
+
+        const response_field = document.createElement('div')
+            response_field.setAttribute('class', 'anwser_options answer-container ms-3 ')
+
+
+        question.reponses.forEach(response => {
+            response_field.appendChild(AnswerField_component(response, question.id))
+        });
+
+        q_field.appendChild(q_intitule)
+        q_field.appendChild(response_field)
+        return q_field
+    }
+
+    function AnswerField_component(response, questionid){
+        const AnswerField = document.createElement('div')
+            AnswerField.setAttribute('class', 'd-flex align-items-center my-1')
+
+        const AnswerIntitule = document.createElement('p')
+            AnswerIntitule.innerHTML = response.intituler
+
+        const radioGoodAnswer = document.createElement('input')
+            radioGoodAnswer.setAttribute('class', 'form-check-input ms-3')
+            radioGoodAnswer.setAttribute('type', 'radio')
+            radioGoodAnswer.setAttribute('name', 'good-answer-' + questionid)
+
+
+        AnswerField.appendChild(AnswerIntitule)
+        AnswerField.appendChild(radioGoodAnswer)
+
+        return AnswerField
+    }
+</script>
