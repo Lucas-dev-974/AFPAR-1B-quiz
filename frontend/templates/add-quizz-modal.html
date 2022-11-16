@@ -1,10 +1,10 @@
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quizz-creation-modal">
     Ajouter un quizz
 </button>
   
   <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="quizz-creation-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
         <div class="modal-header">
@@ -22,8 +22,7 @@
                 <label for="date_session">Date de déploiement</label>
                 <input id="date_session" class="form-control w-40" type="date" />    
             </div>
-            
-            <button type="button" class="btn btn-secondary" id="log-form-quizz">log form</button>
+        
             <button type="button" class="btn btn-primary" id="ajout_quizz_btn">Save changes</button>
         </div>
         </div>
@@ -36,8 +35,6 @@
 
             const logFormQuizz = document.getElementById('log-form-quizz')
             const addQuizzBtn  = document.getElementById('ajout_quizz_btn')
-
-
 
             function getQuizz(){
                 const numberQuestion = creationFormQuizz.childElementCount
@@ -83,11 +80,14 @@
                 const response = await request('/api/quizz/creer', {
                     session_deploiment: date_deploiement.value,
                     quizz_name: 'untilted',
-                    quizz_questions: quizz
+                    quizz_questions: quizz,
+                    participants: [1, 2]
                 })
-
+                
+                if(response.status != 200) return alert('Désoler une erreur est survenue, veuillez essayer plus tard')
                 const jsonresponse = await response.json()
                 console.log(jsonresponse);
+
             })
 
             addQuestionFieldBtn.addEventListener('click', () => {
@@ -99,23 +99,23 @@
                 // Ce conteneur contien un input qui est l'intitulé de la question 
                 // ainsi qu'un élément conteneur pour les réponses possibles 
                 const question_field = document.createElement('div')
-                question_field.setAttribute('class', 'question_field qf-' + questionid)
+                    question_field.setAttribute('class', 'question_field qf-' + questionid)
 
                 // On créer l'input pour entrer l'intitulé de la question
                 const input_question_field = document.createElement('input')
-                input_question_field.setAttribute('placeholder', 'Entrer l\'intitule de la question')
-                input_question_field.setAttribute('class', 'form-control my-1 question-input')
+                    input_question_field.setAttribute('placeholder', 'Entrer l\'intitule de la question')
+                    input_question_field.setAttribute('class', 'form-control my-1 question-input')
 
                 // On créer le conteneur des réponses possible pour la question
                 // Le conteneur de réponse possible lui contient un bouton pour ajouter des choix de réponse
                 // Ainsi que les inputs de ces choix 
                 const responseOptionFieldsContainer = document.createElement('div')
-                responseOptionFieldsContainer.setAttribute('class', 'anwser_options answer-container ms-3 ')
+                    responseOptionFieldsContainer.setAttribute('class', 'anwser_options answer-container ms-3 ')
 
                 // On créer un bouton pour ajouter un input de réponse possible
                 const addAnswerField = document.createElement('button')
-                addAnswerField.setAttribute('class', 'btn btn-primary w-100 btn-sm')
-                addAnswerField.innerHTML = 'Ajouter une réponse possible'
+                    addAnswerField.setAttribute('class', 'btn btn-primary w-100 btn-sm')
+                    addAnswerField.innerHTML = 'Ajouter une réponse possible'
 
 
                 responseOptionFieldsContainer.appendChild(addAnswerField)
@@ -128,16 +128,16 @@
 
                 addAnswerField.addEventListener('click', () => {
                     const AnswerField = document.createElement('div')
-                    AnswerField.setAttribute('class', 'd-flex align-items-center my-1')
+                        AnswerField.setAttribute('class', 'd-flex align-items-center my-1')
                     
                     const AnswerInput    = document.createElement('input')
-                    AnswerInput.setAttribute('placeholder', 'Entrer l\'intitulé de la réponse')
-                    AnswerInput.setAttribute('class', 'form-control')
+                        AnswerInput.setAttribute('placeholder', 'Entrer l\'intitulé de la réponse')
+                        AnswerInput.setAttribute('class', 'form-control')
 
                     const radioGoodAnswer = document.createElement('input')
-                    radioGoodAnswer.setAttribute('class', 'form-check-input ms-3')
-                    radioGoodAnswer.setAttribute('type', 'radio')
-                    radioGoodAnswer.setAttribute('name', 'good-answer' + questionid)
+                        radioGoodAnswer.setAttribute('class', 'form-check-input ms-3')
+                        radioGoodAnswer.setAttribute('type', 'radio')
+                        radioGoodAnswer.setAttribute('name', 'good-answer' + questionid)
 
                     AnswerField.appendChild(AnswerInput)
                     AnswerField.appendChild(radioGoodAnswer)
