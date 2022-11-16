@@ -32,6 +32,18 @@ const storage ={
         localStorage.setItem('quizz-app-storage', jsonstrstate)
     },
 
+    getItemWhere: function(data, where_clause){
+        const item = storage.state()[data]
+
+        const geted = item.filter(_item => {
+            if( _item[where_clause['on_field']] == where_clause['value']) return _item
+ 
+        })
+        
+        if(geted.length > 0) return geted[0]
+        else return false
+    }
+
 }
 
 //  Nous permet de faire des requêtes sans ce soucier d'incerer le token qui se trouve dans le stockage
@@ -70,7 +82,7 @@ const request = async (uri, params, method = 'POST') => {
         ...params
     }
 
-    console.log('options de la requêtes:', options)
+    // console.log('options de la requêtes:', options)
     
     return await fetch(uri, options)
 }   
