@@ -1,32 +1,91 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <h3>Dashboard</h3>
+    <div class="container">
+        <h3>Dashboard</h3>
 
-    <div class="card" style="width: 50%;">
-        <div class="card-header">
-            Import massif
+        <div class="d-flex" >
+            <div class="card my-2" >
+                <div class="card-body">
+                    <h5 class="card-title">Mon profile</h5>
+                    
+                    <div class="d-flex">
+                        <label class='' style='width: 70px'> Nom </label>
+                        <p id='name_field'> test </p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class='' style='width: 70px'> Prénom </label>
+                        <p id='lastname_field'> test </p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class='' style='width: 70px'> Email </label>
+                        <p id='email_field'> test </p>
+                    </div>
+
+                    <div class="d-flex">
+                        <label class='' style='width: 70px'> Secteur </label>
+                        <p id='sector_field'> test </p>
+                    </div>
+                </div>
+            </div>
+
+            {% include './quizz-list.html' %}
         </div>
-        <div>
-            <input type="file" multiple="multiple" id="quizz_import_file_input">
-            <button id="quizz_import_btn">Importer</button>
+        
+
+
+        <div class="w-100" id="admin-dash">
+            {% include './admin-dashboard.html' %}
+        </di>
+
+        <div class="card mt-5">
+            <div class="card-header">
+                Import massif
+            </div>
+            <div>
+                <input type="file" multiple="multiple" id="quizz_import_file_input">
+                <button id="quizz_import_btn">Importer</button>
+            </div>
         </div>
+
+        
     </div>
-
-
-    <div class="card">
-
-    </div>
-
-    {% include 'add-quizz-modal.html' %}
 {% endblock content %}
 
 {% block scripts %}
     <script>
-        document.addEventListener('DOMContentLoaded', ()=> {
+        var component_admin_dash = null
+
+        function setupUserInfos(){
+            const name_field = document.getElementById('name_field'),
+                lastname_field = document.getElementById('lastname_field'),
+                email_field = document.getElementById('email_field'),
+                sector_field = document.getElementById('sector_field')
+
+            const user = storage.state().user
+            
+            console.log('okok')
+            name_field.innerHTML = user.nom ?? ' '
+            email_field.innerHTML = user.email ?? ' '
+            lastname_field.innerHTML = user.prenom ?? ' '
+            sector_field.innerHTML   = user.secteur.type_secteur + ' - ' + user.secteur.titre_secteur
+        }
+
+
+        function accessToAdminDash(){
+            if(storage.state().user.role !== 'DRH'){
+                component_admin_dash.style.display = 'none'
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async ()=> {
             const quizz_import_btn = document.getElementById('quizz_import_btn')
             const input_file       = document.getElementById('quizz_import_file_input')
+            component_admin_dash   = document.getElementById('admin-dash')
 
+            accessToAdminDash()
             quizz_import_btn.addEventListener('click', async ()=> {
                 let mode = 'multiple'
 
@@ -35,11 +94,18 @@
                     mode: mode,
                     file: input_file.files[0]
                 }))
-                console.log(response)   
-            })
-       
+                
 
+                if(response.status != 200) return alert('Désoler une erreur est survenue')
+
+                
+            })
             
+            const responseQuizz = await request('/api/quizz?quizzid=25', {}, 'GET')
+            const jsonQuizz     = await responseQuizz.json()
+
+            console.log(jsonQuizz)
+            setupUserInfos()
         })
     </script>
 {% endblock scripts %}
