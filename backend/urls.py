@@ -10,6 +10,7 @@ urlpatterns = [
     path('quizz/imports', QuizzImport.as_view()), # POST
     path('quizz/creer',   QuizzImport.as_view()), # POST
     path('quizz',         QuizzView.as_view()),   # GET
+    path('quizzs',         QuizzView.as_view()),
 
     path('question', Question.as_view()),
     
