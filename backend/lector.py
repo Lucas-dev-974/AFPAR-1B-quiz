@@ -47,20 +47,24 @@ def saveSalarie(fields):
         nom   = fields['nom'],
         prenom = fields['prenom'],
         matricul = fields['matricul'],
+        secteur_activiter = fields['sector']
     )
 
     salarie.set_password(fields['password'])
     salarie.save()
+
+    return salarie
 
 def getQuestionnaire(file, file_name=""):
     # Instanciation de Element Tree pour pouvoir lire le fichier si fichier XML
     tree = ET.parse(file)
     XMLroot = tree.getroot()
 
+    session = Sessions.objects.create()
     # Créer une entité quizz qui à pour nom le nom du fichier 
     quizz = saveQuizz({
         "quizz_name": str(file),
-        "sessionid": 1,
+        "sessionid": session.pk,
         "secteurid": 1
     })
 
@@ -105,28 +109,80 @@ def getQuestionnaire(file, file_name=""):
 
             linkResponseToQuestion(questionid=question_.pk, responseid=reponse_.pk)
 
+def getSalarieInfos(infos):
+    _infos = {}
+    _infos['sector_type'] = infos[0]
+    _infos['sector_name'] = infos[1]
+    _infos['matricul'] = infos[5]
+    _infos['nom']     = infos[6]
+    _infos['prenom'] = infos[7]
+    _infos['naissance'] = infos[8]
+    _infos['code_postal'] = infos[12]
+    return _infos
+
+def getSectorChief(infos):
+    _infos = {}
+    _infos['sector_type'] = infos[0]
+    _infos['sector_name'] = infos[1]
+    _infos['matricul']    = infos[2]
+    _infos['name']        = infos[3]
+    _infos['last_name']   = infos[4]
+
+    chief = Salarie.objects.filter(matricul = _infos['matricul']).first()
+
+    sector = getOrCreateActivitySector(_infos['sector_type'], _infos['sector_name'])
+
+    if chief is None:
+        chief = saveSalarie({
+            'email': _infos['matricul'] + '@gmail.com',
+            'password': _infos['matricul'] + '1234',
+            'nom': _infos['name'],
+            'prenom': _infos['last_name'],
+            'matricul': _infos['matricul'],
+            'sector': sector
+        })
+
+    if sector.chef_secteur is None:
+        sector.chef_secteur = chief
+        sector.save()
+
+    return _infos
+
+
+def getOrCreateActivitySector(sector_type, sector_name):
+    print(sector_type, sector_name)
+    sector = SecteursActivite.objects.filter(titre_secteur = sector_name).first()
+
+    if sector is None:
+        sector = SecteursActivite.objects.create(
+            type_secteur = sector_type,
+            titre_secteur = sector_name
+        )
+
+    return sector
+
+
 def getSalaries(file):
     _file = file.read().decode('utf-8').splitlines()
-    print(_file[1].split(';'))
-
+    _file.pop(0)
 
     for user_infos in _file:
         infos = user_infos.split(';')
-        secteur = infos[0]
-        secteur_name = infos[1]
-        matricule_salarie = infos[5]
-        salarie_name = infos[6]
-        salarie_last_name = infos[7] 
-        salarie_naissance = infos[8]
-        salarie_code_postal = infos[12]
+        salarie_data = getSalarieInfos(infos)
+        sector_infos = getOrCreateActivitySector(salarie_data['sector_type'], salarie_data['sector_name'])
 
         saveSalarie({
-            'email': matricule_salarie + '@gmail.com',
-            'nom': salarie_name,
-            'prenom': salarie_last_name,
-            'matricul': matricule_salarie,
-            'password': matricule_salarie + '1234'
-        })
+            'email': salarie_data['matricul'] + '@gmail.com',
+            'password': salarie_data['matricul'] + '1234',
+            'nom': salarie_data['nom'],
+            'prenom': salarie_data['prenom'],
+            'matricul': salarie_data['matricul'],
+            'sector': sector_infos
+        })  
+
+        getSectorChief(infos)
+    
+
 
     
     # for row in reader:
