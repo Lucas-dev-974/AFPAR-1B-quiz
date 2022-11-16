@@ -13,8 +13,7 @@ class SalarieManager(BaseUserManager):
         if not email:
             raise ValueError(('The Email must be set'))
         email = self.normalize_email(email) 
-        role  = 'user'
-        user = self.model(email=email, role=role, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save()
         return user
@@ -26,6 +25,8 @@ class SalarieManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('role', 'DRH')
+        
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError(   ('Superuser must have is_staff=True.'))
