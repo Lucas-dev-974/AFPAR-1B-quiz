@@ -6,9 +6,9 @@ from .managers import *
 
 
 class SecteursActivite(models.Model):
-    type_secteur = models.CharField(db_column='Type_secteur', max_length=50)  # Field name made lowercase.
+    type_secteur  = models.CharField(db_column='Type_secteur', max_length=50)  # Field name made lowercase.
     titre_secteur = models.CharField(max_length=50)
-
+    chef_secteur  = models.OneToOneField('salarie', on_delete=models.DO_NOTHING, null=True, blank=True)
 
 
 # On instancie ici un model salarié qui serat les utilisateurs de l'app
@@ -29,6 +29,7 @@ class Salarie(AbstractUser):
 
     objects = SalarieManager()
 
+    exclude = ('password', )
     def __str__(self):
         return self.email
 
@@ -38,15 +39,15 @@ class Sessions(models.Model):
 
 
 class Participe(models.Model):
-    matricule_salarie = models.ForeignKey(Salarie, models.DO_NOTHING, unique=False)  # Field name made lowercase.
+    userid   = models.ForeignKey(Salarie, models.DO_NOTHING, unique=False)  # Field name made lowercase.
     idsession = models.ForeignKey(Sessions, models.DO_NOTHING, unique=False)  # Field name made lowercase.
 
 class Quizz(models.Model):
-    noteminimal = models.IntegerField(db_column='NoteMinimal', blank=True, null=True)  # Field name made lowercase.
+    noteminimal    = models.IntegerField(db_column='NoteMinimal', blank=True, null=True)  # Field name made lowercase.
     etat_brouillon = models.IntegerField(db_column='Etat_brouillon', blank=True, null=True)  # Field name made lowercase.
-    nom_quizz = models.CharField(max_length=70, blank=True, null=True)
-    idsession = models.ForeignKey(Sessions, models.DO_NOTHING)  # Field name made lowercase.
-    id_sa = models.ForeignKey(SecteursActivite, models.DO_NOTHING, unique=False)  # Field name made lowercase.
+    nom_quizz      = models.CharField(max_length=70, blank=True, null=True)
+    idsession      = models.ForeignKey(Sessions, models.DO_NOTHING)  # Field name made lowercase.
+    id_sa          = models.ForeignKey(SecteursActivite, models.DO_NOTHING, unique=False)  # Field name made lowercase.
 
 
 
